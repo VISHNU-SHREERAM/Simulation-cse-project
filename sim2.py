@@ -2,8 +2,9 @@ import random
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
-
-startPopulation_Lion = 50
+#my second commit
+h=""
+startPopulation_Lion = 1
 startPopulation = 3000
 infantMortality = 10
 LioninfantMortality = 0
