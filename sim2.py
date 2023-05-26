@@ -2,10 +2,9 @@ import random
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
-#my second commit
-h=""
-startPopulation_Lion = 1
-startPopulation = 3000
+
+startPopulation_Lion = 50
+startPopulation = 2000
 infantMortality = 10
 LioninfantMortality = 0
 youthMortality = 0
@@ -28,10 +27,30 @@ class Person:
         self.range = range_
 
     def move(self):
-        self.x += random.uniform(-0.01, 0.01)
-        self.y += random.uniform(-0.01, 0.01)
-        self.x = max(0, min(10, self.x))
-        self.y = max(0, min(10, self.y))
+        # Check if there are any lions within the range
+        nearby_lions = [lion for lion in LionDictionary if distance(self.x, self.y, lion.x, lion.y) <= self.range]
+
+        # If there are nearby lions, try to move away from them
+        if nearby_lions:
+            lion_x, lion_y = nearby_lions[0].x, nearby_lions[0].y
+
+            # Calculate the direction away from the lion
+            dx = self.x - lion_x
+            dy = self.y - lion_y
+
+            # Normalize the direction vector
+            magnitude = np.sqrt(dx**2 + dy**2)
+            if magnitude > 0:
+                dx /= magnitude
+                dy /= magnitude
+
+            # Move away from the lion by adding the direction vector
+            self.x += dx * random.uniform(0.1, 0.1)
+            self.y += dy * random.uniform(0.1, 0.1)
+
+        # Ensure the person stays within the boundaries
+        self.x = max(0, min(20, self.x))
+        self.y = max(0, min(20, self.y))
 
 class Lion:
     def __init__(self, age, skill, x, y, range_):
@@ -45,10 +64,33 @@ class Lion:
         self.range = range_
 
     def move(self):
-        self.x += random.uniform(-0.5, 0.5)
-        self.y += random.uniform(-0.5, 0.5)
-        self.x = max(0, min(10, self.x))
-        self.y = max(0, min(10, self.y))
+        # Check if there are any people within the range
+        nearby_people = [person for person in peopleDictionary if distance(self.x, self.y, person.x, person.y) <= self.range]
+
+        # If there are nearby people, try to move towards them
+        if nearby_people:
+            person_x, person_y = nearby_people[0].x, nearby_people[0].y
+
+            # Calculate the direction towards the person
+            dx = person_x - self.x
+            dy = person_y - self.y
+
+            # Normalize the direction vector
+            magnitude = np.sqrt(dx**2 + dy**2)
+            if magnitude > 0:
+                dx /= magnitude
+                dy /= magnitude
+
+            # Move towards the person by adding the direction vector
+            self.x += dx * random.uniform(0.1, 0.1)
+            self.y += dy * random.uniform(0.1, 0.1)
+
+        # Ensure the lion stays within the boundaries
+        self.x = max(0, min(20, self.x))
+        self.y = max(0, min(20, self.y))
+# Calculate Euclidean distance between two points (x1, y1) and (x2, y2)
+def distance(x1, y1, x2, y2):
+    return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
 def harvest(food, agriculture):
     ablePeople = 0
@@ -74,13 +116,12 @@ def avgskill(lions):
 def prey():
     for lion in LionDictionary:
         if lion.age > 8:
-            if len(peopleDictionary) > 0 and len(peopleDictionary) / area > 1:
+            if len(peopleDictionary) > 0 and len(peopleDictionary) / area > 1 and lion.health < 10:
                 potentialPreys = [p for p in peopleDictionary if distance(lion.x, lion.y, p.x, p.y) <= lion.range]
                 if potentialPreys:
                     prey = random.choice(potentialPreys)
                     peopleDictionary.remove(prey)
-                    if lion.health < 10 and lion.skill > 1:
-                        lion.health += lion.skill
+                    lion.health += lion.skill
             else:
                 lion.health -= 1
                 if lion.health < 1:
@@ -90,22 +131,22 @@ def reproduce(fertilityx, fertilityy, infantMortality, LioninfantMortality):
     for person in peopleDictionary:
         if person.gender == 1 and fertilityx < person.age < fertilityy:
             if random.randint(0, 5) == 1 and random.randint(0, 100) > infantMortality:
-                peopleDictionary.append(Person(0, person.x, person.y, person.range))
+                peopleDictionary.append(Person(0, person.x, person.y, person.range+random.uniform(-1,1)))#adding mutation to range traits
     for lion in LionDictionary:
         if lion.gender == 1 and fertilityx < lion.age < fertilityy:
                 if random.randint(0, 3) == 1 and random.randint(0, 100) > LioninfantMortality:
                     ranskill = random.uniform(lion.skill - 0.5, lion.skill + 0.5)
-                    LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range))
+                    LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range+random.uniform(-1,1)))#adding mutation to range traits
 
 def beginSim():
-    for _ in range(startPopulation):
-        x = random.uniform(0, 10)
-        y = random.uniform(0, 10)
+    for i in range(startPopulation):
+        x = random.uniform(0, 20)
+        y = random.uniform(0, 20)
         range_ = random.uniform(1, 2)  # Range for each person
         peopleDictionary.append(Person(random.randint(18, 50), x, y, range_))
-    for _ in range(startPopulation_Lion):
-        x = random.uniform(0, 10)
-        y = random.uniform(0, 10)
+    for j in range(startPopulation_Lion):
+        x = random.uniform(0, 20)
+        y = random.uniform(0, 20)
         range_ = random.uniform(1, 3)  # Range for each lion
         LionDictionary.append(Lion(random.randint(18, 30), random.uniform(1, 2.5), x, y, range_))
 
@@ -152,16 +193,12 @@ beginSim()
 fig, ax = plt.subplots()
 
 # Set the limits of the plot
-ax.set_xlim(0, 10)
-ax.set_ylim(0, 10)
+ax.set_xlim(0, 20)
+ax.set_ylim(0, 20)
 
 
-# Calculate Euclidean distance between two points (x1, y1) and (x2, y2)
-def distance(x1, y1, x2, y2):
-    return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-
-people_plot = ax.scatter([], [], c='blue', label='People')
-lion_plot = ax.scatter([], [], c='red', label='Lions')
+people_plot = ax.scatter([], [], c='blue', label='People',s=15)#s gives the size of marker
+lion_plot = ax.scatter([], [], c='red', label='Lions',s=15)
 
 # Initialize the year counter
 year = 2023
