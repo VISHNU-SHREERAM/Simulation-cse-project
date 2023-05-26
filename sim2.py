@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
 
-startPopulation_Lion = 50
-startPopulation = 2000
+startPopulation_Lion = 5
+startPopulation = 200
 infantMortality = 10
 LioninfantMortality = 0
 youthMortality = 0
@@ -45,8 +45,11 @@ class Person:
                 dy /= magnitude
 
             # Move away from the lion by adding the direction vector
-            self.x += dx * random.uniform(0.1, 0.1)
-            self.y += dy * random.uniform(0.1, 0.1)
+            self.x += dx * random.uniform(-0.1, 0.1)
+            self.y += dy * random.uniform(-0.1, 0.1)
+        else:
+            self.x += random.uniform(-0.1, 0.1)
+            self.y += random.uniform(-0.1, 0.1)
 
         # Ensure the person stays within the boundaries
         self.x = max(0, min(20, self.x))
@@ -82,9 +85,11 @@ class Lion:
                 dy /= magnitude
 
             # Move towards the person by adding the direction vector
-            self.x += dx * random.uniform(0.1, 0.1)
-            self.y += dy * random.uniform(0.1, 0.1)
-
+            self.x += dx * random.uniform(-0.1, 0.1)
+            self.y += dy * random.uniform(-0.1, 0.1)
+        else:
+            self.x += random.uniform(-0.1, 0.1)
+            self.y += random.uniform(-0.1, 0.1)
         # Ensure the lion stays within the boundaries
         self.x = max(0, min(20, self.x))
         self.y = max(0, min(20, self.y))
@@ -193,8 +198,8 @@ beginSim()
 fig, ax = plt.subplots()
 
 # Set the limits of the plot
-ax.set_xlim(0, 20)
-ax.set_ylim(0, 20)
+ax.set_xlim(-1, 21)
+ax.set_ylim(-1, 21)
 
 
 people_plot = ax.scatter([], [], c='blue', label='People',s=15)#s gives the size of marker
@@ -214,8 +219,15 @@ def update(frame):
     runYear(food, agriculture, fertilityx, fertilityy, infantMortality, disasterChance, youthMortality, LioninfantMortality)
 
     # Update scatter plot data
-    people_plot.set_offsets([(person.x, person.y) for person in peopleDictionary])
-    lion_plot.set_offsets([(lion.x, lion.y) for lion in LionDictionary])
+    people_offsets=[(person.x, person.y) for person in peopleDictionary]
+    people_offsets=np.array(people_offsets).reshape(-1,2)
+    people_plot.set_offsets(people_offsets)
+    lion_offsets = [(lion.x, lion.y) for lion in LionDictionary]
+    lion_offsets = np.array(lion_offsets).reshape(-1, 2)
+    lion_plot.set_offsets(lion_offsets)
+
+
+    #lion_plot.set_offsets([(lion.x, lion.y) for lion in LionDictionary])
 
     # Calculate average skill
     averageskill = avgskill(LionDictionary)
