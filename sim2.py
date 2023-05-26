@@ -2,7 +2,7 @@ import random
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
-
+#vaibhav
 startPopulation_Lion = 50
 startPopulation = 2000
 infantMortality = 10
