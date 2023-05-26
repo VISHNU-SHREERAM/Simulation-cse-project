@@ -2,6 +2,7 @@ import random
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
+from matplotlib.widgets import Button
 
 startPopulation_Lion = 5
 startPopulation = 200
@@ -85,8 +86,8 @@ class Lion:
                 dy /= magnitude
 
             # Move towards the person by adding the direction vector
-            self.x += dx * random.uniform(-0.1, 0.1)
-            self.y += dy * random.uniform(-0.1, 0.1)
+            self.x += dx * random.uniform(-0.5, 0.5)
+            self.y += dy * random.uniform(-0.5, 0.5)
         else:
             self.x += random.uniform(-0.1, 0.1)
             self.y += random.uniform(-0.1, 0.1)
@@ -207,11 +208,22 @@ lion_plot = ax.scatter([], [], c='red', label='Lions',s=15)
 
 # Initialize the year counter
 year = 2023
+# Create pause and play buttons
+pause_button_ax = plt.axes([0.81, 0.05, 0.1, 0.05])
+pause_button = Button(pause_button_ax, 'Pause', hovercolor='0.9')
+
+play_button_ax = plt.axes([0.7, 0.05, 0.1, 0.05])
+play_button = Button(play_button_ax, 'Play', hovercolor='0.9')
+
+# Flag to control animation state
+animation_paused = False
+
 
 # Update function for the animation
 def update(frame):
     global year
-
+    if animation_paused:
+        return
     # Calculate the current year based on the frame number
     year += 1
 
@@ -234,9 +246,20 @@ def update(frame):
 
     # Set title with average skill and year
     ax.set_title(f'Year: {year}\nAverage Skill: {averageskill:.2f} Lions:{len(LionDictionary)}\n Humans:{len(peopleDictionary)}')
-
+# Button click event handlers
+def pause_animation(event):
+    global animation_paused
+    animation_paused = True
+    animation.event_source.stop()
+def play_animation(event):
+    global animation_paused
+    animation_paused = False
+    animation.event_source.start()
+# Set button click event handlers
+pause_button.on_clicked(pause_animation)
+play_button.on_clicked(play_animation)
 # Create animation
-animation = FuncAnimation(fig, update, frames=500, interval=10, repeat=False)
+animation = FuncAnimation(fig, update, frames=60, interval=10, repeat=False)
 
 # Add legend
 ax.legend()
