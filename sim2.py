@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
 #vaibhav
-startPopulation_Lion = 50
-startPopulation = 2000
+startPopulation_Lion = 5
+startPopulation = 500
 infantMortality = 10
 LioninfantMortality = 0
 youthMortality = 0
@@ -201,7 +201,7 @@ people_plot = ax.scatter([], [], c='blue', label='People',s=15)#s gives the size
 lion_plot = ax.scatter([], [], c='red', label='Lions',s=15)
 
 # Initialize the year counter
-year = 2023
+year = 0
 
 # Update function for the animation
 def update(frame):
