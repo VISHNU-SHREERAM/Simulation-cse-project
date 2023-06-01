@@ -4,7 +4,7 @@ from matplotlib.animation import FuncAnimation
 import numpy as np
 from matplotlib.widgets import Button
 
-startPopulation_Lion = 5
+startPopulation_Lion = 10
 startPopulation = 200
 infantMortality = 10
 LioninfantMortality = 0
@@ -18,6 +18,9 @@ peopleDictionary = []
 LionDictionary = []
 area = 100
 averageskill = 0
+def nearbylions(self,radius):
+    nearby_lions = [lion for lion in LionDictionary if distance(self.x, self.y, lion.x, lion.y) <= radius]
+    return nearby_lions
 class Person:
     def __init__(self, age, x, y, range_,speed):
         self.gender = random.randint(0, 1)
@@ -27,11 +30,9 @@ class Person:
         self.y = y
         self.range = range_
         self.speed = speed
-
     def move(self):
         # Check if there are any lions within the range
-        nearby_lions = [lion for lion in LionDictionary if distance(self.x, self.y, lion.x, lion.y) <= self.range]
-
+        nearby_lions=nearbylions(self,self.range)
         # If there are nearby lions, try to move away from them
         if nearby_lions:
             lion_x, lion_y = nearby_lions[0].x, nearby_lions[0].y
@@ -63,7 +64,7 @@ class Lion:
         self.age = age
         self.pregnant = 0
         self.skill = skill
-        self.health = 5
+        self.health = 10
         self.x = x
         self.y = y
         self.range = range_
@@ -85,18 +86,6 @@ class Lion:
             # Calculate the direction towards the person
             dx = person_x - self.x
             dy = person_y - self.y
-
-
-        else:
-            dx = 0
-            dy = 0
-    
-    # Calculate the direction away from other lions
-        for lion in nearby_lions:
-            lion_x, lion_y = lion.x, lion.y
-            dx -= lion_x - self.x
-            dy -= lion_y - self.y
-
             # Normalize the direction vector
             magnitude = np.sqrt(dx**2 + dy**2)
             if magnitude > 0:
@@ -106,12 +95,19 @@ class Lion:
             # Move towards the person by adding the direction vector
             self.x += dx * self.speed
             self.y += dy * self.speed
-        else:
-            #self.x += random.uniform(-0.1, 0.1)
-            #self.y += random.uniform(-0.1, 0.1)
+        elif len(nearby_lions)>5:
+            self.x += random.uniform(-1, 1)
+            self.y += random.uniform(-1, 1)
         # Ensure the lion stays within the boundaries
             self.x = max(0, min(20, self.x))
             self.y = max(0, min(20, self.y))
+        else:
+            self.x += random.uniform(-0.1, 0.1)
+            self.y += random.uniform(-0.1, 0.1)
+        # Ensure the lion stays within the boundaries
+            self.x = max(0, min(20, self.x))
+            self.y = max(0, min(20, self.y))
+
 # Calculate Euclidean distance between two points (x1, y1) and (x2, y2)
 def distance(x1, y1, x2, y2):
     return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
@@ -151,7 +147,7 @@ def avgskill(lions):
 def prey():
     for lion in LionDictionary:
         if lion.age > 8:
-            if len(peopleDictionary) > 0 and len(peopleDictionary) / area > 1 and lion.health < 5:
+            if len(peopleDictionary) > 0 and len(peopleDictionary) / area > 1 and lion.health < 10:
                 potentialPreys = [p for p in peopleDictionary if distance(lion.x, lion.y, p.x, p.y) <= lion.range]
                 if potentialPreys:
                     prey = random.choice(potentialPreys)
@@ -162,13 +158,11 @@ def prey():
                 lion.health -= 1
                 if lion.health < 1:
                     LionDictionary.remove(lion)
-        if lion.age > 50 and lion.health>=1:
+        if lion.age > 50 and lion.health >=1:
             LionDictionary.remove(lion)        #to reduce the for loop we are giving these functions inside this folder
         else:
             lion.age += 1
             lion.move()
-
-
 def reproduce(fertilityx, fertilityy, infantMortality, LioninfantMortality):
     for person in peopleDictionary:
         if person.gender == 1 and fertilityx < person.age < fertilityy:
