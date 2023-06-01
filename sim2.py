@@ -281,8 +281,6 @@ pause_button.on_clicked(pause_animation)
 play_button.on_clicked(play_animation)
 # Create animation
 animation = FuncAnimation(fig, update, frames=200, interval=100, repeat=False, blit=False)
-animation = FuncAnimation(fig, update, frames=200, interval=100, repeat=False, blit=False)
-
 # Add legend
 ax.legend()
 
