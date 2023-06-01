@@ -63,7 +63,7 @@ class Lion:
         self.age = age
         self.pregnant = 0
         self.skill = skill
-        self.health = 5
+        self.health = 3
         self.x = x
         self.y = y
         self.range = range_
@@ -132,7 +132,7 @@ def avgskill(lions):
 def prey():
     for lion in LionDictionary:
         if lion.age > 8:
-            if len(peopleDictionary) > 0 and len(peopleDictionary) / area > 1 and lion.health < 5:
+            if len(peopleDictionary) > 0 and len(peopleDictionary) / area > 1 and lion.health < 3:
                 potentialPreys = [p for p in peopleDictionary if distance(lion.x, lion.y, p.x, p.y) <= lion.range]
                 if potentialPreys:
                     prey = random.choice(potentialPreys)
