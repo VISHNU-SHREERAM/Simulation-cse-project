@@ -2,9 +2,10 @@ import random
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.widgets import Button
 
-startPopulation_Lion = 10
+startPopulation_Lion = 5
 startPopulation = 200
 infantMortality = 10
 LioninfantMortality = 0
@@ -18,9 +19,6 @@ peopleDictionary = []
 LionDictionary = []
 area = 100
 averageskill = 0
-def nearbylions(self,radius):
-    nearby_lions = [lion for lion in LionDictionary if distance(self.x, self.y, lion.x, lion.y) <= radius]
-    return nearby_lions
 class Person:
     def __init__(self, age, x, y, range_,speed):
         self.gender = random.randint(0, 1)
@@ -30,9 +28,11 @@ class Person:
         self.y = y
         self.range = range_
         self.speed = speed
+
     def move(self):
         # Check if there are any lions within the range
-        nearby_lions=nearbylions(self,self.range)
+        nearby_lions = [lion for lion in LionDictionary if distance(self.x, self.y, lion.x, lion.y) <= self.range]
+
         # If there are nearby lions, try to move away from them
         if nearby_lions:
             lion_x, lion_y = nearby_lions[0].x, nearby_lions[0].y
@@ -64,7 +64,7 @@ class Lion:
         self.age = age
         self.pregnant = 0
         self.skill = skill
-        self.health = 10
+        self.health = 5
         self.x = x
         self.y = y
         self.range = range_
@@ -108,12 +108,8 @@ class Lion:
             self.x = max(0, min(20, self.x))
             self.y = max(0, min(20, self.y))
 
-# Calculate Euclidean distance between two points (x1, y1) and (x2, y2)
 def distance(x1, y1, x2, y2):
     return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-
-
-
 
 def harvest(food, agriculture):
     ablePeople = 0
@@ -147,7 +143,7 @@ def avgskill(lions):
 def prey():
     for lion in LionDictionary:
         if lion.age > 8:
-            if len(peopleDictionary) > 0 and len(peopleDictionary) / area > 1 and lion.health < 10:
+            if len(peopleDictionary) > 0 and len(peopleDictionary) / area > 1 and lion.health < 5:
                 potentialPreys = [p for p in peopleDictionary if distance(lion.x, lion.y, p.x, p.y) <= lion.range]
                 if potentialPreys:
                     prey = random.choice(potentialPreys)
@@ -158,11 +154,13 @@ def prey():
                 lion.health -= 1
                 if lion.health < 1:
                     LionDictionary.remove(lion)
-        if lion.age > 50 and lion.health >=1:
+        if lion.age > 50 and lion.health>=1:
             LionDictionary.remove(lion)        #to reduce the for loop we are giving these functions inside this folder
         else:
             lion.age += 1
             lion.move()
+
+
 def reproduce(fertilityx, fertilityy, infantMortality, LioninfantMortality):
     for person in peopleDictionary:
         if person.gender == 1 and fertilityx < person.age < fertilityy:
@@ -173,7 +171,6 @@ def reproduce(fertilityx, fertilityy, infantMortality, LioninfantMortality):
                 if random.randint(0, 3) == 1 and random.randint(0, 100) > LioninfantMortality:
                     ranskill = random.uniform(lion.skill - 0.5, lion.skill + 0.5)
                     LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range+random.uniform(-1,1),lion.speed+random.uniform(-0.5,0.5)))#adding mutation to range traits
-
 def beginSim():
     for i in range(startPopulation):
         x = random.uniform(0, 20)
@@ -226,18 +223,19 @@ def runYear(food, agriculture, fertilityx, fertilityy, infantMortality, disaster
         LionDictionary.append(Lion(10,4,x,y, random.uniform(1, 3),1))  # Add lion with random range
 
 beginSim()
+# Create a 3D figure and axis
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
 
-# Create a figure and axis
-fig, ax = plt.subplots()
-
-# Set the limits of the plot
+# Set the limits of the plot in the XY plane
 ax.set_xlim(-1, 21)
 ax.set_ylim(-1, 21)
 
-
-people_plot = ax.scatter([], [], c='blue', label='People',s=15)#s gives the size of marker
-lion_plot = ax.scatter([], [], c='red', label='Lions',s=15)
-
+# Update the scatter plot data with Z-axis coordinates
+people_offsets = np.array([(person.x, person.y, 0) for person in peopleDictionary])
+lion_offsets = np.array([(lion.x, lion.y, 0) for lion in LionDictionary])
+people_plot = ax.scatter([], [], [], marker='o', c='blue', label='People', s=15)
+lion_plot = ax.scatter([], [], [], c='red', label='Lions', s=15)
 # Initialize the year counter
 year = 0
 # Create pause and play buttons
@@ -249,8 +247,6 @@ play_button = Button(play_button_ax, 'Play', hovercolor='0.9')
 
 # Flag to control animation state
 animation_paused = False
-
-
 # Update function for the animation
 def update(frame):
     global year
@@ -261,24 +257,17 @@ def update(frame):
 
     # Run simulation for one year
     runYear(food, agriculture, fertilityx, fertilityy, infantMortality, disasterChance, youthMortality, LioninfantMortality)
-
-    # Update scatter plot data
-    people_offsets=[(person.x, person.y) for person in peopleDictionary]
-    people_offsets=np.array(people_offsets).reshape(-1,2)
-    people_plot.set_offsets(people_offsets)
-    lion_offsets = [(lion.x, lion.y) for lion in LionDictionary]
-    lion_offsets = np.array(lion_offsets).reshape(-1, 2)
-    lion_plot.set_offsets(lion_offsets)
-
-
-    #lion_plot.set_offsets([(lion.x, lion.y) for lion in LionDictionary])
-
+    # Update scatter plot data with Z-axis coordinates
+    people_offsets = np.array([[person.x, person.y, 0] for person in peopleDictionary])
+    lion_offsets = np.array([[lion.x, lion.y, 0] for lion in LionDictionary])
+    people_plot._offsets3d = people_offsets.T
+    lion_plot._offsets3d = lion_offsets.T
     # Calculate average skill
     averageskill = avgskill(LionDictionary)
 
     # Set title with average skill and year
     ax.set_title(f'Year: {year}\nAverage Skill: {averageskill:.2f} Lions:{len(LionDictionary)}\n Humans:{len(peopleDictionary)}')
-# Button click event handlers
+    # Button click event handlers
 def pause_animation(event):
     global animation_paused
     animation_paused = True
@@ -291,7 +280,7 @@ def play_animation(event):
 pause_button.on_clicked(pause_animation)
 play_button.on_clicked(play_animation)
 # Create animation
-animation = FuncAnimation(fig, update, frames=200, interval=50, repeat=False)
+animation = FuncAnimation(fig, update, frames=200, interval=100, repeat=False, blit=False)
 
 # Add legend
 ax.legend()
