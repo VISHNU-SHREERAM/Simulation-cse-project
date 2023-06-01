@@ -1,6 +1,8 @@
 import random
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+matplotlib.use('TkAgg')
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.widgets import Button
