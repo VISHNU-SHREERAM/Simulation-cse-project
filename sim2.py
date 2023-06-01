@@ -63,7 +63,7 @@ class Lion:
         self.age = age
         self.pregnant = 0
         self.skill = skill
-        self.health = 10
+        self.health = 5
         self.x = x
         self.y = y
         self.range = range_
@@ -151,7 +151,7 @@ def avgskill(lions):
 def prey():
     for lion in LionDictionary:
         if lion.age > 8:
-            if len(peopleDictionary) > 0 and len(peopleDictionary) / area > 1 and lion.health < 10:
+            if len(peopleDictionary) > 0 and len(peopleDictionary) / area > 1 and lion.health < 5:
                 potentialPreys = [p for p in peopleDictionary if distance(lion.x, lion.y, p.x, p.y) <= lion.range]
                 if potentialPreys:
                     prey = random.choice(potentialPreys)
@@ -162,7 +162,7 @@ def prey():
                 lion.health -= 1
                 if lion.health < 1:
                     LionDictionary.remove(lion)
-        if lion.age > 50:
+        if lion.age > 50 and lion.health>=1:
             LionDictionary.remove(lion)        #to reduce the for loop we are giving these functions inside this folder
         else:
             lion.age += 1
@@ -297,7 +297,7 @@ def play_animation(event):
 pause_button.on_clicked(pause_animation)
 play_button.on_clicked(play_animation)
 # Create animation
-animation = FuncAnimation(fig, update, frames=100, interval=50, repeat=False)
+animation = FuncAnimation(fig, update, frames=200, interval=50, repeat=False)
 
 # Add legend
 ax.legend()
