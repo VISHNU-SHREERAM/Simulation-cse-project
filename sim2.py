@@ -10,7 +10,7 @@ from matplotlib.widgets import Button
 startPopulation_Lion = 5
 startPopulation = 200
 infantMortality = 10
-LioninfantMortality = 0
+LioninfantMortality = 50
 youthMortality = 0
 agriculture = 5
 disasterChance = 10
