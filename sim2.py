@@ -73,13 +73,29 @@ class Lion:
         # Check if there are any people within the range
         nearby_people = [person for person in peopleDictionary if distance(self.x, self.y, person.x, person.y) <= self.range]
 
+
+        nearby_lions = [lion for lion in LionDictionary if lion != self and distance(self.x, self.y, lion.x, lion.y) <= self.range]
+
         # If there are nearby people, try to move towards them
         if nearby_people:
             person_x, person_y = nearby_people[0].x, nearby_people[0].y
 
+
+
             # Calculate the direction towards the person
             dx = person_x - self.x
             dy = person_y - self.y
+
+
+        else:
+            dx = 0
+            dy = 0
+    
+    # Calculate the direction away from other lions
+        for lion in nearby_lions:
+            lion_x, lion_y = lion.x, lion.y
+            dx -= lion_x - self.x
+            dy -= lion_y - self.y
 
             # Normalize the direction vector
             magnitude = np.sqrt(dx**2 + dy**2)
@@ -91,14 +107,17 @@ class Lion:
             self.x += dx * self.speed
             self.y += dy * self.speed
         else:
-            self.x += random.uniform(-0.1, 0.1)
-            self.y += random.uniform(-0.1, 0.1)
+            #self.x += random.uniform(-0.1, 0.1)
+            #self.y += random.uniform(-0.1, 0.1)
         # Ensure the lion stays within the boundaries
-        self.x = max(0, min(20, self.x))
-        self.y = max(0, min(20, self.y))
+            self.x = max(0, min(20, self.x))
+            self.y = max(0, min(20, self.y))
 # Calculate Euclidean distance between two points (x1, y1) and (x2, y2)
 def distance(x1, y1, x2, y2):
     return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+
+
 
 def harvest(food, agriculture):
     ablePeople = 0
