@@ -1,6 +1,8 @@
 import random
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+matplotlib.use('TkAgg')
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.widgets import Button
@@ -9,7 +11,7 @@ import time
 startPopulation_Lion = 50
 startPopulation = 200
 infantMortality = 10
-LioninfantMortality = 0
+LioninfantMortality = 50
 youthMortality = 0
 agriculture = 5
 disasterChance = 10
