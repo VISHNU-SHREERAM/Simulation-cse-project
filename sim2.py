@@ -4,8 +4,9 @@ from matplotlib.animation import FuncAnimation
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.widgets import Button
+import time
 
-startPopulation_Lion = 5
+startPopulation_Lion = 50
 startPopulation = 200
 infantMortality = 10
 LioninfantMortality = 0
@@ -19,6 +20,7 @@ peopleDictionary = []
 LionDictionary = []
 area = 100
 averageskill = 0
+start = time.time()
 class Person:
     def __init__(self, age, x, y, range_,speed):
         self.gender = random.randint(0, 1)
@@ -28,14 +30,16 @@ class Person:
         self.y = y
         self.range = range_
         self.speed = speed
+        self.nearby_lion = [lion for lion in LionDictionary if distancesquare(self.x, self.y, lion.x, lion.y) <= self.range**2]
+        self.nearby_people = [person for person in peopleDictionary if distancesquare(self.x, self.y, person.x, person.y) <= self.range ** 2]
 
     def move(self):
-        # Check if there are any lions within the range
-        nearby_lions = [lion for lion in LionDictionary if distance(self.x, self.y, lion.x, lion.y) <= self.range]
-
         # If there are nearby lions, try to move away from them
-        if nearby_lions:
-            lion_x, lion_y = nearby_lions[0].x, nearby_lions[0].y
+        self.nearby_lion = [lion for lion in LionDictionary if distancesquare(self.x, self.y, lion.x, lion.y) <= self.range**2]
+        self.nearby_people = [person for person in peopleDictionary if distancesquare(self.x, self.y, person.x, person.y) <= self.range ** 2]
+
+        if self.nearby_lion:
+            lion_x, lion_y = self.nearby_lion[0].x, self.nearby_lion[0].y
 
             # Calculate the direction away from the lion
             dx = self.x - lion_x
@@ -64,22 +68,20 @@ class Lion:
         self.age = age
         self.pregnant = 0
         self.skill = skill
-        self.health = 5
+        self.health = 8
         self.x = x
         self.y = y
         self.range = range_
         self.speed = speed
+        self.nearby_lion = [lion for lion in LionDictionary if distancesquare(self.x, self.y, lion.x, lion.y) <= self.range**2]
+        self.nearby_people = [person for person in peopleDictionary if distancesquare(self.x, self.y, person.x, person.y) <= self.range ** 2]
 
     def move(self):
         # Check if there are any people within the range
-        nearby_people = [person for person in peopleDictionary if distance(self.x, self.y, person.x, person.y) <= self.range]
-
-
-        nearby_lions = [lion for lion in LionDictionary if lion != self and distance(self.x, self.y, lion.x, lion.y) <= self.range]
 
         # If there are nearby people, try to move towards them
-        if nearby_people:
-            person_x, person_y = nearby_people[0].x, nearby_people[0].y
+        if self.nearby_people:
+            person_x, person_y = self.nearby_people[0].x, self.nearby_people[0].y
 
 
 
@@ -95,7 +97,7 @@ class Lion:
             # Move towards the person by adding the direction vector
             self.x += dx * self.speed
             self.y += dy * self.speed
-        elif len(nearby_lions)>5:
+        elif len(self.nearby_lion)>5:
             self.x += random.uniform(-1, 1)
             self.y += random.uniform(-1, 1)
         # Ensure the lion stays within the boundaries
@@ -108,8 +110,8 @@ class Lion:
             self.x = max(0, min(20, self.x))
             self.y = max(0, min(20, self.y))
 
-def distance(x1, y1, x2, y2):
-    return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+def distancesquare(x1, y1, x2, y2):
+    return ((x2 - x1)**2 + (y2 - y1)**2)
 
 def harvest(food, agriculture):
     ablePeople = 0
@@ -144,10 +146,11 @@ def prey():
     for lion in LionDictionary:
         if lion.age > 8:
             if len(peopleDictionary) > 0 and len(peopleDictionary) / area > 1 and lion.health < 5:
-                potentialPreys = [p for p in peopleDictionary if distance(lion.x, lion.y, p.x, p.y) <= lion.range]
+                potentialPreys = lion.nearby_people
                 if potentialPreys:
                     prey = random.choice(potentialPreys)
-                    peopleDictionary.remove(prey)
+                    if prey in peopleDictionary:  # Check if prey exists in the list
+                        peopleDictionary.remove(prey)
                     lion.health += lion.skill
 
             else:
@@ -163,14 +166,21 @@ def prey():
 
 def reproduce(fertilityx, fertilityy, infantMortality, LioninfantMortality):
     for person in peopleDictionary:
-        if person.gender == 1 and fertilityx < person.age < fertilityy:
-            if random.randint(0, 5) == 1 and random.randint(0, 100) > infantMortality:
-                peopleDictionary.append(Person(0, person.x, person.y, person.range+random.uniform(-1,1),person.speed+random.uniform(-0.5,0.5)))#adding mutation to range traits
+        if person.gender == 1 and fertilityx < person.age < fertilityy :
+            nearby_males=[male for male in person.nearby_people if male.gender == 0 ]
+            if nearby_males:
+                if random.randint(0, 5) == 1 and random.randint(0, 100) > infantMortality:
+
+                    peopleDictionary.append(Person(0, person.x, person.y, 
+                                                person.range+random.uniform(-1,1),
+                                                person.speed+random.uniform(-0.5,0.5)))#adding mutation to range traits
     for lion in LionDictionary:
-        if lion.gender == 1 and fertilityx < lion.age < fertilityy:
-                if random.randint(0, 3) == 1 and random.randint(0, 100) > LioninfantMortality:
-                    ranskill = random.uniform(lion.skill - 0.5, lion.skill + 0.5)
-                    LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range+random.uniform(-1,1),lion.speed+random.uniform(-0.5,0.5)))#adding mutation to range traits
+        if lion.gender == 1 and fertilityx < lion.age < fertilityy and lion.health>=3 :
+                nearby_malelions=[male for male in lion.nearby_lion if male.gender == 0 ]
+                if nearby_malelions:
+                    if random.randint(0, 3) == 1 and random.randint(0, 100) > LioninfantMortality:
+                        ranskill = random.uniform(lion.skill - 0.5, lion.skill + 0.5)
+                        LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range+random.uniform(-1,1),lion.speed+random.uniform(-0.5,0.5)))#adding mutation to range traits
 def beginSim():
     for i in range(startPopulation):
         x = random.uniform(0, 20)
@@ -186,9 +196,8 @@ def beginSim():
         LionDictionary.append(Lion(random.randint(18, 30), random.uniform(1, 2.5), x, y, range_,speed))
 
 def runYear(food, agriculture, fertilityx, fertilityy, infantMortality, disasterChance, youthMortality, LioninfantMortality):
-    harvest(food, agriculture)
     prey()
-    
+    harvest(food, agriculture)
     """for person in peopleDictionary:
         if person.age > 80:
             peopleDictionary.remove(person)
@@ -221,6 +230,10 @@ def runYear(food, agriculture, fertilityx, fertilityy, infantMortality, disaster
         LionDictionary.append(Lion(10,4,x,y, random.uniform(1, 3),1))  # Add lion with random range
         LionDictionary.append(Lion(10,4,x,y, random.uniform(1, 3),1.5))  # Add lion with random range
         LionDictionary.append(Lion(10,4,x,y, random.uniform(1, 3),1))  # Add lion with random range
+    for l in LionDictionary:
+        l.nearby_lion = [lion for lion in LionDictionary if distancesquare(l.x, l.y, lion.x, lion.y) <= l.range**2]
+    for p in peopleDictionary:
+        p.nearby_people = [person for person in peopleDictionary if distancesquare(p.x, p.y, person.x, person.y) <= p.range ** 2]
 
 beginSim()
 # Create a 3D figure and axis
