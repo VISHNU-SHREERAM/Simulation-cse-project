@@ -11,7 +11,7 @@ import time
 startPopulation_Lion = 50
 startPopulation = 200
 infantMortality = 10
-LioninfantMortality = 50
+LioninfantMortality = 30
 youthMortality = 0
 agriculture = 5
 disasterChance = 10
@@ -56,6 +56,9 @@ class Person:
             # Move away from the lion by adding the direction vector
             self.x += dx * self.speed
             self.y += dy * self.speed
+        elif(len(self.nearby_people)>10):
+            self.x += random.uniform(-1, 1)  #People will run because no space for them
+            self.y += random.uniform(-1, 1)
         else:
             self.x += random.uniform(-0.1, 0.1)  #People will run with speed only  when lion is near
             self.y += random.uniform(-0.1, 0.1)
