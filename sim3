@@ -231,6 +231,10 @@ ax.dist = initial_zoom
 # Set the limits of the plot in the XY plane
 ax.set_xlim(-1, 21)
 ax.set_ylim(-1, 21)
+
+ax.w_xaxis.set_pane_color((0.53, 0.81, 0.92, 1.0))  # Sky blue
+ax.w_yaxis.set_pane_color((0.53, 0.81, 0.92, 1.0))
+ax.w_zaxis.set_pane_color((0.1, 1, 0.1, 1.0))
 population_sizes = []
 population_sizesLions = []
 # Update the scatter plot data with Z-axis coordinates
