@@ -31,6 +31,7 @@ lionaverage_speed=0
 humanaverage_range=0
 lionaverage_range=0
 mutation = 1  # Initial value for mutation
+rain = 1  # Initial value for rain factor
 class Person:
     def __init__(self, age, x, y, range_,speed):
         self.gender = random.randint(0, 1)
@@ -122,6 +123,7 @@ def distancesquare(x1, y1, x2, y2):
     return ((x2 - x1)**2 + (y2 - y1)**2)
 
 def harvest(food, agriculture):
+    global rain
     ablePeople = 0
     for person in peopleDictionary:   ##to reduce the for loop we are giving these functions inside this folder
         if person.age > 8:
@@ -131,7 +133,7 @@ def harvest(food, agriculture):
         else:
             person.age += 1
             person.move()     
-    food += ablePeople * agriculture
+    food += ablePeople * agriculture*rain
 
     if food < len(peopleDictionary):
         del peopleDictionary[0:int(len(peopleDictionary) - food)]
@@ -236,7 +238,9 @@ def runYear(food, agriculture, fertilityx, fertilityy, infantMortality, disaster
 def update_mutation(val):
     global mutation
     mutation = val
-
+def update_rain(val):
+    global rain
+    rain = val
 # Slider callback function
 def update_zoom(val):
     ax.dist = val
@@ -290,6 +294,10 @@ zoom_slider.on_changed(update_zoom)
 ax_mutation = plt.axes([0.1, 0.1, 0.15, 0.03])
 mutation_slider = Slider(ax_mutation, 'Mutation', valmin=0, valmax=2, valinit=mutation)
 mutation_slider.on_changed(update_mutation)
+# Create a slider widget for rain
+ax_rain = plt.axes([0.1, 0.15, 0.15, 0.03])
+rain_slider = Slider(ax_rain, 'Rain', valmin=0, valmax=2.5, valinit=rain)
+rain_slider.on_changed(update_rain)
 
 
 
@@ -298,6 +306,8 @@ animation_paused = True
 # Update function for the animation
 def update(frame):
     try:
+        if len(peopleDictionary)<=1:
+            return
         if len(LionDictionary)<=2:
             LionDictionary.append(Lion(5,2,random.uniform(0,20),random.uniform(0,20), random.uniform(1, 3),1))
         global year
