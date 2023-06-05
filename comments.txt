@@ -9,7 +9,7 @@ from matplotlib.widgets import Button
 from matplotlib.widgets import Slider
 import matplotlib.pyplot as plt2
 
-
+#Initial parameters for the simulation
 startPopulation_Lion = 20
 startPopulation = 300
 infantMortality = 10
@@ -20,46 +20,40 @@ disasterChance = 10
 fertilityx = 18
 fertilityy = 40
 food = 1
-peopleDictionary = []
-LionDictionary = []
-area = 100
-averageskill = 0
-humanaverage_age=0
-lionaverage_age=0
-humanaverage_speed=0
-lionaverage_speed=0
-humanaverage_range=0
-lionaverage_range=0
-mutation = 1  # Initial value for mutation
-rain = 1  # Initial value for rain factor
+peopleDictionary = []    #List to store people 
+LionDictionary = []      #List to store Lion
+area = 100               #Total are of the simulation
+averageskill = 0         #Average skill of all lions
+# Person class representing a person in the simulation
 class Person:
     def __init__(self, age, x, y, range_,speed):
-        self.gender = random.randint(0, 1)
+        self.gender = random.randint(0, 1)  # Randomly assign gender (0 - male, 1 - female)
         self.age = age
+        self.pregnant = 0
         self.x = x
         self.y = y
-        self.range = range_
-        self.speed = speed
+        self.range = range_ # Range within which the person can detect and interact with others
+        self.speed = speed  #speed of person
 
     def move(self):
-        # Check if there are any lions within the range
+        # Check if there are any lions in their range
         nearby_lions = [lion for lion in LionDictionary if distancesquare(self.x, self.y, lion.x, lion.y) <= self.range**2]
         nearby_people=[person for person in peopleDictionary if self != person and distancesquare(self.x, self.y, person.x, person.y) <= self.range**2]
-        # If there are nearby lions, try to move away from them
+        # If there are nearby lions, move away from them
         if nearby_lions:
             lion_x, lion_y = nearby_lions[0].x, nearby_lions[0].y
 
-            # Calculate the direction away from the lion
+            # Calculating the direction away from the lion
             dx = self.x - lion_x
             dy = self.y - lion_y
 
-            # Normalize the direction vector
+            # taking unit vector of the direction vector
             magnitude = (dx**2 + dy**2)**0.5
             if magnitude > 0:
                 dx /= magnitude
                 dy /= magnitude
 
-            # Move away from the lion by adding the direction vector
+            # Moving away from the lion by adding the direction vector
             self.x += dx * self.speed
             self.y += dy * self.speed
         elif len(nearby_people)>20:
@@ -73,16 +67,18 @@ class Person:
         self.x = max(0, min(20, self.x))
         self.y = max(0, min(20, self.y))
 
+# Lion class representing a lion in simulation
 class Lion:
     def __init__(self, age, skill, x, y, range_,speed):
         self.gender = random.randint(0, 1)
         self.age = age
-        self.skill = skill
-        self.health = 5
+        self.pregnant = 0
+        self.skill = skill  #Skill level of the lion
+        self.health = 5   #Health level of the lion (Initial health 5)
         self.x = x
         self.y = y
-        self.range = range_
-        self.speed = speed
+        self.range = range_   # Range within which the lion can interact with others and also detect humans to hunt
+        self.speed = speed   # Speed of lions
 
     def move(self):
         # Check if there are any people within the range
@@ -118,29 +114,33 @@ class Lion:
         # Ensure the lion stays within the boundaries
         self.x = max(0, min(20, self.x))
         self.y = max(0, min(20, self.y))
-
+# Function to calculate the square of the distance between two points
 def distancesquare(x1, y1, x2, y2):
     return ((x2 - x1)**2 + (y2 - y1)**2)
 
+# Function to calculate harvest of food by people
 def harvest(food, agriculture):
-    global rain
     ablePeople = 0
-    for person in peopleDictionary:   ##to reduce the for loop we are giving these functions inside this folder
+    for person in peopleDictionary:   #to reduce the for loop we are giving these functions inside this folder
         if person.age > 8:
             ablePeople += 1
         if person.age >80:
             peopleDictionary.remove(person)
         else:
             person.age += 1
-            person.move()     
-    food += ablePeople * agriculture*rain
+            person.move()
+        
+
+            
+    food += ablePeople * agriculture   
 
     if food < len(peopleDictionary):
-        del peopleDictionary[0:int(len(peopleDictionary) - food)]
+        del peopleDictionary[0:int(len(peopleDictionary) - food)]     #if food is less than the number of people then reamining people will die 
         food = 0
     else:
-        food -= len(peopleDictionary)
+        food -= len(peopleDictionary)    # Each person consumes 1 unit of food per year
 
+#Function to calculate average skill of lions
 def avgskill(lions):
     total_skill = sum(lion.skill for lion in lions)
     if len(lions) > 0:
@@ -148,14 +148,14 @@ def avgskill(lions):
     else:
         return 0
 
-
+#fuction to simulate the hunting of lion
 def prey():
     for lion in LionDictionary:
         if lion.age > 3:
-            if len(peopleDictionary) > 0 and len(peopleDictionary) / area > 1 and lion.health < 5:
+            if len(peopleDictionary) > 0 and len(peopleDictionary) / area > 1 and lion.health < 5:           # Determine the number of people and lions in close proximity
                 potentialPreys = [p for p in peopleDictionary if distancesquare(lion.x, lion.y, p.x, p.y) <= lion.range**2]
                 if potentialPreys:
-                    prey = random.choice(potentialPreys)
+                    prey = random.choice(potentialPreys)   #randomly select a person from the nearby people
                     peopleDictionary.remove(prey)
                     lion.health += lion.skill
                 else:
@@ -171,40 +171,24 @@ def prey():
             lion.move()
 
 
+# Function to simulate reproduction
 def reproduce(fertilityx, fertilityy, infantMortality, LioninfantMortality):
-    global humanaverage_age
-    global lionaverage_age
-    global humanaverage_speed
-    global lionaverage_speed
-    global humanaverage_range
-    global lionaverage_range
-    global mutation
-    humanaverage_age=0
-    lionaverage_age=0
-    humanaverage_speed=0
-    lionaverage_speed=0
-    humanaverage_range=0
-    lionaverage_range=0
+    # Each person has a chance to reproduce randomly
     for person in peopleDictionary:
-        humanaverage_age+=person.age/len(peopleDictionary)
-        humanaverage_speed+=person.speed/len(peopleDictionary)
-        humanaverage_range+=person.range/len(peopleDictionary)     
         if person.gender == 1 and fertilityx < person.age < fertilityy:
             if random.randint(0, 5) == 1 and random.randint(0, 100) > infantMortality:
-                peopleDictionary.append(Person(0, person.x, person.y, person.range+random.uniform(-1,1)*mutation,person.speed+random.uniform(-0.5,0.5)*mutation))#adding mutation to range traits
+                peopleDictionary.append(Person(0, person.x, person.y, person.range+random.uniform(-1,1),person.speed+random.uniform(-0.5,0.5)))#adding mutation to range traits
+    # Each lion has a chance to reproduce randomly
     for lion in LionDictionary:
-        lionaverage_age+=lion.age/len(LionDictionary)
-        lionaverage_speed+=lion.speed/len(LionDictionary)
-        lionaverage_range+=lion.range/len(LionDictionary)
         if lion.gender == 1 and 3 < lion.age < 15 :
                 if random.randint(0, 2) == 1 and random.randint(0, 100) > LioninfantMortality:
-                    ranskill = lion.skill+random.uniform(-0.5,0.5)*mutation
-                    LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range+random.uniform(0,0)*mutation,lion.speed+random.uniform(-0.5,0.5)*mutation))#adding mutation to range traits
+                    ranskill = random.uniform(lion.skill - 0.5, lion.skill + 0.5)
+                    LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range+random.uniform(-1,1),lion.speed+random.uniform(-0.5,0.5)))#adding mutation to range traits
 def beginSim():
     for i in range(startPopulation):
         x = random.uniform(0, 20)
         y = random.uniform(0, 20)
-        range_ = random.uniform(1, 3)  # Range for each person
+        range_ = random.uniform(1, 2)  # Range for each person
         speed = random.uniform(0.5,1)
         peopleDictionary.append(Person(random.randint(18, 50), x, y, range_,speed))
     for j in range(startPopulation_Lion):
@@ -235,19 +219,14 @@ def runYear(food, agriculture, fertilityx, fertilityy, infantMortality, disaster
         LionDictionary.append(Lion(5,2,x,y, random.uniform(1, 3),1))  # Add lion with random range
         LionDictionary.append(Lion(5,2,x,y, random.uniform(1, 3),1.5))  # Add lion with random range
         LionDictionary.append(Lion(5,2,x,y, random.uniform(1, 3),1))  # Add lion with random range
-def update_mutation(val):
-    global mutation
-    mutation = val
-def update_rain(val):
-    global rain
-    rain = val
 # Slider callback function
 def update_zoom(val):
     ax.dist = val
     fig.canvas.draw_idle()
 
 beginSim()
-fig, ax2 = plt2.subplots(3,sharex=True,sharey=False)
+fig, ax2 = plt2.subplots()
+
 # Create a 3D figure and axis
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
@@ -262,17 +241,9 @@ ax.set_ylim(-1, 21)
 
 ax.w_xaxis.set_pane_color((0.53, 0.81, 0.92, 1.0))  # Sky blue
 ax.w_yaxis.set_pane_color((0.53, 0.81, 0.92, 1.0))
-ax.w_zaxis.set_pane_color((0.1, 1, 0.1, 1.0))
+ax.w_zaxis.set_pane_color((0.1, 0.55, 0.1, 1.0))
 population_sizes = []
 population_sizesLions = []
-lionavg_skill=[]
-human_average_age=[]
-lion_average_age=[]
-human_average_speed=[]
-lion_average_speed=[]
-human_average_range=[]
-lion_average_range=[]
-
 # Update the scatter plot data with Z-axis coordinates
 people_offsets = np.array([(person.x, person.y, 0) for person in peopleDictionary])
 lion_offsets = np.array([(lion.x, lion.y, 0) for lion in LionDictionary])
@@ -284,45 +255,22 @@ year = 0
 pause_button_ax = plt.axes([0.81, 0.05, 0.1, 0.05])
 pause_button = Button(pause_button_ax, 'Pause', hovercolor='0.9')
 
-add_lion_button_ax = plt.axes([0.80, 0.885, 0.025, 0.025])
-add_lion_button = Button(add_lion_button_ax, '+',color='0.9', hovercolor='red',)
-
-add_people_button_ax = plt.axes([0.80, 0.915, 0.025, 0.025])
-add_people_button = Button(add_people_button_ax, '+',color='0.9', hovercolor='blue',)
-
 play_button_ax = plt.axes([0.7, 0.05, 0.1, 0.05])
 play_button = Button(play_button_ax, 'Play', hovercolor='0.9')
 # Create a slider widget
 ax_slider = plt.axes([0.1, 0.05, 0.15, 0.03])
 zoom_slider = Slider(ax_slider, 'Zoom', valmin=5, valmax=10, valinit=initial_zoom)
 zoom_slider.on_changed(update_zoom)
-# Create a slider widget for mutation
-ax_mutation = plt.axes([0.1, 0.1, 0.15, 0.03])
-mutation_slider = Slider(ax_mutation, 'Mutation', valmin=0, valmax=2, valinit=mutation)
-mutation_slider.on_changed(update_mutation)
-# Create a slider widget for rain
-ax_rain = plt.axes([0.1, 0.15, 0.15, 0.03])
-rain_slider = Slider(ax_rain, 'Rain', valmin=0, valmax=2.5, valinit=rain)
-rain_slider.on_changed(update_rain)
-
 
 
 # Flag to control animation state
-animation_paused = True
+animation_paused = False
 # Update function for the animation
 def update(frame):
     try:
-        # if len(peopleDictionary)<=1:
-        #     return
         if len(LionDictionary)<=2:
             LionDictionary.append(Lion(5,2,random.uniform(0,20),random.uniform(0,20), random.uniform(1, 3),1))
         global year
-        global humanaverage_age
-        global lionaverage_age
-        global humanaverage_speed
-        global lionaverage_speed
-        global humanaverage_range
-        global lionaverage_range
         if animation_paused:
             return
         # Calculate the current year based on the frame number
@@ -343,45 +291,12 @@ def update(frame):
                 # Update population data
         population_sizes.append(len(peopleDictionary))
         population_sizesLions.append(len(LionDictionary))
-        lionavg_skill.append(averageskill)
-        human_average_age.append(humanaverage_age)
-        lion_average_age.append(lionaverage_age)
-        human_average_speed.append(humanaverage_speed)
-        human_average_range.append(humanaverage_range)
-        lion_average_speed.append(lionaverage_speed)
-        lion_average_range.append(lionaverage_range)
-
-        ax2[0].clear()
-        ax2[0].plot(range(year), population_sizes, color='blue', label='Humans Population')
-        ax2[0].plot(range(year), population_sizesLions, color='red', label='Lions Population')
-        ax2[0].legend()
-        ax2[1].clear()
-        ax2[1].plot(range(year),human_average_speed, color='blue', label='Humans avg speed')
-        ax2[1].plot(range(year),human_average_range, color='purple', label='Humans avg range')
-        ax2[1].plot(range(year),lion_average_speed, color='orange', label='lions avg speed')
-        ax2[1].plot(range(year),lion_average_range, color='yellow', label='lions avg range')
-        #ax2[1].plot(range(year), lionavg_skill , color='red', label='Lions average Skill')
-        ax2[1].legend()
-        ax2[2].clear()
-        ax2[2].plot(range(year),human_average_age , color='blue', label='Humans average age')
-        ax2[2].plot(range(year), lion_average_age, color='red', label='Lions average age')
-        ax2[2].legend()
-        ax2[0].set_ylabel('Population')
-        ax2[0].set_title('Population Comparison')
-        ax2[1].set_ylabel('Speed and Range')
-        ax2[1].set_title('Average Speed and Range Comparison')
-        ax2[2].set_xlabel('Year')
-        ax2[2].set_ylabel('Average Age')
-        ax2[2].set_title('Average Age Comparison')
-        ax2[0].legend(loc='upper left', bbox_to_anchor=(0, 1), fontsize='smaller')
-        ax2[1].legend(loc='upper left', bbox_to_anchor=(0, 1), fontsize='smaller')
-        ax2[2].legend(loc='upper left', bbox_to_anchor=(0, 1), fontsize='smaller')
-
-        plt.setp(ax2[0].get_legend().get_texts(), fontsize='small')  # Set legend text font size
-        plt.setp(ax2[1].get_legend().get_texts(), fontsize='small')  # Set legend text font size
-        plt.setp(ax2[2].get_legend().get_texts(), fontsize='small')  # Set legend text font size
-
+        ax2.clear()
+        ax2.plot(range(year), population_sizes, color='blue', label='Humans Graph')
+        ax2.plot(range(year), population_sizesLions, color='red', label='Lions Graph')
+        ax2.legend()
         plt2.show()
+
     except Exception as e:
         print(f"An error occurred: {str(e)}")
         year+=1
@@ -390,12 +305,6 @@ def pause_animation(event):
     global animation_paused
     animation_paused = True
     animation.event_source.stop()
-
-def add_lion(event):
-    LionDictionary.append(Lion(5,2,random.uniform(0,20),random.uniform(0,20), random.uniform(1, 2),1.5))
-def add_people(event):
-    peopleDictionary.append(Person(15,random.uniform(0,20),random.uniform(0,20), random.uniform(1, 2),1.5))
-
 def play_animation(event):
     global animation_paused
     animation_paused = False
@@ -403,12 +312,10 @@ def play_animation(event):
 # Set button click event handlers
 pause_button.on_clicked(pause_animation)
 play_button.on_clicked(play_animation)
-add_lion_button.on_clicked(add_lion)
-add_people_button.on_clicked(add_people)
 # Create animation
 animation = FuncAnimation(fig, update, frames=400, interval=100, repeat=False, blit=False)
 # Add legend
 ax.legend()
-ax.legend(loc='upper left', bbox_to_anchor=(0.9, 1.1), fontsize='small')
+ax.legend()
 # Show plot
 plt.show()
