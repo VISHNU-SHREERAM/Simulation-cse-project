@@ -199,7 +199,7 @@ def reproduce(fertilityx, fertilityy, infantMortality, LioninfantMortality):
         if lion.gender == 1 and 3 < lion.age < 15 :
                 if random.randint(0, 2) == 1 and random.randint(0, 100) > LioninfantMortality:
                     ranskill = lion.skill+random.uniform(-0.5,0.5)*mutation
-                    LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range+random.uniform(0,0)*mutation,lion.speed+random.uniform(-0.5,0.5)*mutation))#adding mutation to range traits
+                    LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range+random.uniform(1,1)*mutation,lion.speed+random.uniform(-0.5,0.5)*mutation))#adding mutation to range traits
 def beginSim():
     for i in range(startPopulation):
         x = random.uniform(0, 20)
