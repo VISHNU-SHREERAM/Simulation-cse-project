@@ -203,8 +203,8 @@ def reproduce(min_age_fertility, max_age_fertility, infant_mortality, Lioninfant
         if person.gender == 1 and min_age_fertility < person.age < max_age_fertility:
             if random.randint(0, 5) == 1 and random.randint(0, 100) > infant_mortality:
                 peopleDictionary.append(Person(0, person.x, person.y, person.range + random.uniform(-1, 1) * mutation,
-                                               person.speed + random.uniform(-0.5,
-                                                                             0.5) * mutation))  # adding mutation to range traits
+                                               person.speed +
+                                               random.uniform(-0.5, 0.5) * mutation))  # adding mutation to range traits
     for lion in LionDictionary:
         lionaverage_age += lion.age / len(LionDictionary)
         lionaverage_speed += lion.speed / len(LionDictionary)
@@ -213,8 +213,8 @@ def reproduce(min_age_fertility, max_age_fertility, infant_mortality, Lioninfant
             if random.randint(0, 2) == 1 and random.randint(0, 100) > Lioninfant_mortality:
                 ranskill = lion.skill + random.uniform(-0.5, 0.5) * mutation
                 LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range + random.uniform(1, 1) * mutation,
-                                           lion.speed + random.uniform(-0.5,
-                                                                       0.5) * mutation))  # adding mutation to range traits
+                                           lion.speed +
+                                           random.uniform(-0.5, 0.5) * mutation))  # adding mutation to range traits
 
 
 def begin_simulation():
@@ -286,9 +286,9 @@ ax.dist = initial_zoom
 ax.set_xlim(-1, 21)
 ax.set_ylim(-1, 21)
 
-ax.w_xaxis.set_pane_color((0.53, 0.81, 0.92, 1.0))  # Sky blue
-ax.w_yaxis.set_pane_color((0.53, 0.81, 0.92, 1.0))
-ax.w_zaxis.set_pane_color((0.1, 1, 0.1, 1.0))
+ax.xaxis.set_pane_color((0.53, 0.81, 0.92, 1.0))  # Sky blue
+ax.yaxis.set_pane_color((0.53, 0.81, 0.92, 1.0))
+ax.zaxis.set_pane_color((0.1, 1, 0.1, 1.0))
 population_sizes = []
 population_sizesLions = []
 lionavg_skill = []
@@ -355,8 +355,8 @@ def update(frame):
         year += 1
 
         # Run simulation for one year
-        runyear(food, agriculture, min_age_fertility, max_age_fertility, infant_mortality, disaster_chance, youth_mortality,
-                Lioninfant_mortality)
+        runyear(food, agriculture, min_age_fertility, max_age_fertility,
+                infant_mortality, disaster_chance, youth_mortality, Lioninfant_mortality)
         # Update scatter plot data with Z-axis coordinates
         people_offsets = np.array([[person.x, person.y, 0] for person in peopleDictionary])
         lion_offsets = np.array([[lion.x, lion.y, 0] for lion in LionDictionary])
@@ -367,7 +367,8 @@ def update(frame):
 
         # Set title with average skill and year
         ax.set_title(
-            f'Year: {year}\nAverage Skill: {averageskill:.2f} Lions:{len(LionDictionary)}\n Humans:{len(peopleDictionary)}')
+            f'Year: {year}\nAverage Skill: {averageskill:.2f} Lions:{len(LionDictionary)}\n'
+            f' Humans:{len(peopleDictionary)}')
         # Update population data
         population_sizes.append(len(peopleDictionary))
         population_sizesLions.append(len(LionDictionary))
