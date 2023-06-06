@@ -6,9 +6,18 @@ import numpy as np
 from matplotlib.widgets import Button
 from matplotlib.widgets import Slider
 import matplotlib.pyplot as plt2
+import pygame
 
 matplotlib.use('TkAgg')
+pygame.init()
 
+# Function to play background music
+def play_bgm():
+    pygame.mixer.music.load('The Blue Planet.mp3')
+    pygame.mixer.music.play(-1)
+# Initialize pygame mixer and play the background music
+pygame.mixer.init()
+play_bgm()
 
 startPopulation_Lion = 20
 startPopulation = 300
