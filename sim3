@@ -341,7 +341,7 @@ rain_slider = Slider(ax_rain, 'Rain', valmin=0, valmax=2.5, valinit=rain)
 rain_slider.on_changed(update_rain)
 
 # Flag to control animation state
-animation_paused = True
+animation_paused = False
 
 
 # Update function for the animation
