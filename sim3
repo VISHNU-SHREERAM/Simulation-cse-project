@@ -221,7 +221,7 @@ def reproduce(min_age_fertility, max_age_fertility, infant_mortality, Lioninfant
         if lion.gender == 1 and 3 < lion.age < 15:
             if random.randint(0, 2) == 1 and random.randint(0, 100) > Lioninfant_mortality:
                 ranskill = lion.skill + random.uniform(-0.5, 0.5) * mutation
-                LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range + random.uniform(1, 1) * mutation,
+                LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range + random.uniform(-1, 1) * mutation,
                                            lion.speed +
                                            random.uniform(-0.5, 0.5) * mutation))  # adding mutation to range traits
 
@@ -452,7 +452,7 @@ play_button.on_clicked(play_animation)
 add_lion_button.on_clicked(add_lion)
 add_people_button.on_clicked(add_people)
 # Create animation
-animation = FuncAnimation(fig, update, frames=400, interval=100, repeat=False, blit=False)
+animation = FuncAnimation(fig, update, frames=50, interval=100, repeat=False, blit=False)
 # Add legend
 ax.legend()
 ax.legend(loc='upper left', bbox_to_anchor=(0.9, 1.1), fontsize='small')
