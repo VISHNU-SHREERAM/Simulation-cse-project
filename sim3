@@ -10,7 +10,7 @@ import pygame
 
 matplotlib.use('TkAgg')
 pygame.init()
-
+music_paused = False
 # Function to play background music
 def play_bgm():
     pygame.mixer.music.load('The Blue Planet.mp3')
@@ -18,6 +18,23 @@ def play_bgm():
 # Initialize pygame mixer and play the background music
 pygame.mixer.init()
 play_bgm()
+
+def pause_music(event):
+    global music_paused
+    if not music_paused:
+        pygame.mixer.music.pause()
+        music_paused = True
+
+def play_music(event):
+    global music_paused
+    if music_paused:
+        pygame.mixer.music.unpause()
+        music_paused = False
+
+
+
+# Start playing the music
+pygame.mixer.music.play()
 
 startPopulation_Lion = 20
 startPopulation = 300
@@ -451,8 +468,10 @@ pause_button.on_clicked(pause_animation)
 play_button.on_clicked(play_animation)
 add_lion_button.on_clicked(add_lion)
 add_people_button.on_clicked(add_people)
+play_button.on_clicked(play_music)
+pause_button.on_clicked(pause_music)
 # Create animation
-animation = FuncAnimation(fig, update, frames=50, interval=100, repeat=False, blit=False)
+animation = FuncAnimation(fig, update, frames=300, interval=100, repeat=False, blit=False)
 # Add legend
 ax.legend()
 ax.legend(loc='upper left', bbox_to_anchor=(0.9, 1.1), fontsize='small')
