@@ -1,14 +1,14 @@
 # Simulation-cse-project
-# Simulation-cse-project
+# TEAM MEMBERS
 team members:
 1.Vishnu Sreeram
 2.G.Sai Rohith
 3.Vaibhav Yadav 
-| Left-Aligned  | Center Aligned  | Right Aligned | Left-Aligned  |
-| :------------ |:---------------:| :-----| :-----|
-| col 3 is      | some wordy text | $1600 |$1600 |
-| col 2 is      | centered        |   $12 |$1600 |
-| zebra stripes | are neat        |    $1 |$1600 |
+| NAME  | ROLL.NO  |
+| :------------ |:---------------:|
+|  .Vishnu Sreeram     | 142201014 |
+| G.Sai Rohith      | 142201019        |
+| Vaibhav Yadav | 142201015        |
 
 
 project overview
