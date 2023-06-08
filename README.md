@@ -11,14 +11,14 @@
 The theme of the project is to simulate the dynamics of human and lion populations, analyze the factors influencing their interactions, and provide an analysis of the simulation results. This project includes modeling individual movement, reproduction, mortality, and the effects of various factors on population dynamics.
 
 #  libraries used
-the following libraries are used in our project
-1.matplotlib:Python library for data visualization, including plotting graphs and creating animations
-2.FuncAnimation
-3.Button
-4.Slider
-5.numpy:Python library for numerical computations and array operations.
-6.pygamePython library for game development and multimedia applications.
-7.random: Python library for generating random numbers and making random selections.
+the following libraries are used in our project   
+1.matplotlib:Python library for data visualization, including plotting graphs and creating animations  
+2.FuncAnimation  
+3.Button  
+4.Slider  
+5.numpy:Python library for numerical computations and array operations.  
+6.pygamePython library for game development and multimedia applications.  
+7.random: Python library for generating random numbers and making random selections.  
 
 
 #  Installation
