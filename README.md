@@ -29,4 +29,4 @@ To install the project, follow these steps:
 3. install the required Python libraries by running the following command:
 pip install -r requirements.txt
 # Regarding the branches
-We have our default branch as master and inside it THE FINAL CODE-SIM3 , but we also have another branch main , where our initial codes are kept.
+We have our default branch as master and inside it FINAL SIMULATION, but we also have another branch main , where our initial codes are kept.
