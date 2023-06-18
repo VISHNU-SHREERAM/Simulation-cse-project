@@ -9,7 +9,7 @@
 
 # Theme of the prjoect
 The theme of the project is to simulate the dynamics of human and lion populations, analyze the factors influencing their interactions, and provide an analysis of the simulation results. This project includes modeling individual movement, reproduction, mortality, and the effects of various factors on population dynamics.
-# TO RUN THE MAIN PROJECT PLEASE USE THE --- THE FINAL CODE - SIM3
+# TO RUN THE MAIN PROJECT PLEASE USE THE --- THE FINAL SIMULATION
 All the other files are the "_paths_" through which we developed this code
 #  libraries used
 the following libraries are used in our project   
