@@ -49,9 +49,14 @@ class Person:
         self.age = age
         self.x = x
         self.y = y
-        self.range = range_
-        self.speed = speed
-
+        if range_> 0:
+            self.range = range_
+        else:
+            self.range =0
+        if range_> 0:
+            self.speed = speed
+        else:
+            self.speed = 0
     def move(self):
         # Check if there are any lions within the range
         nearby_lions = [lion for lion in LionDictionary if
@@ -95,8 +100,14 @@ class Lion:
         self.health = 5
         self.x = x
         self.y = y
-        self.range = range_
-        self.speed = speed
+        if range_> 0:
+            self.range = range_
+        else:
+            self.range =0
+        if range_> 0:
+            self.speed = speed
+        else:
+            self.speed = 0
 
     def move(self):
         # Check if there are any people within the range
