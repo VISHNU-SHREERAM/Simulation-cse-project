@@ -161,8 +161,9 @@ def distancesquare(x1, y1, x2, y2):
     return (x2 - x1) ** 2 + (y2 - y1) ** 2
 
 
-def harvest(food, agriculture):
+def harvest(agriculture):
     global rain
+    global food
     ablepeople = 0
     # to reduce the for loop we are giving these functions inside this folder
     for person in peopleDictionary:
@@ -192,8 +193,8 @@ def avgskill(lions):
 
 def prey():
     for lion in LionDictionary:
-        if lion.age > 3:
-            if len(peopleDictionary) > 0 and lion.health < 5:
+        if lion.age > 2:
+            if len(peopleDictionary) > 0 and lion.health < 3:
                 potentialpreys = [p for p in peopleDictionary if
                                   distancesquare(lion.x, lion.y, p.x, p.y) <= lion.range ** 2]
                 if potentialpreys:
@@ -240,7 +241,7 @@ def reproduce(min_age_fertility, max_age_fertility, infant_mortality, Lioninfant
         lionaverage_age += lion.age / len(LionDictionary)
         lionaverage_speed += lion.speed / len(LionDictionary)
         lionaverage_range += lion.range / len(LionDictionary)
-        if lion.gender == 1 and 3 < lion.age < 15:
+        if lion.gender == 1 and 5 < lion.age < 15:
             if random.randint(0, 2) == 1 and random.randint(0, 100) > Lioninfant_mortality:
                 ranskill = lion.skill + random.uniform(-0.5, 0.5) * mutation
                 LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range + random.uniform(-1, 1) * mutation,
@@ -263,9 +264,9 @@ def begin_simulation():
         LionDictionary.append(Lion(random.randint(3, 15), random.uniform(1, 2.5), x, y, range_, speed))
 
 
-def runyear(food, agriculture, min_age_fertility, max_age_fertility, infant_mortality, disaster_chance, youth_mortality,
+def runyear(agriculture, min_age_fertility, max_age_fertility, infant_mortality, disaster_chance, youth_mortality,
             Lioninfant_mortality):
-    harvest(food, agriculture)
+    harvest(agriculture)
     prey()
     reproduce(min_age_fertility, max_age_fertility, infant_mortality, Lioninfant_mortality)
 
@@ -296,30 +297,15 @@ def update_rain(val):
     global rain
     rain = val
 
-
-# Slider callback function
-def update_zoom(val):
-    ax.dist = val
-    fig.canvas.draw_idle()
-
-
 begin_simulation()
 fig, ax2 = plt2.subplots(3, sharex=True, sharey=False)
-# Create a 3D figure and axis
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-# Set viewing angle and zoom level
-ax.view_init(elev=30, azim=45)  # Set the elevation and azimuth angles
-# Set initial zoom level
-initial_zoom = 8
-ax.dist = initial_zoom
+
+fig, ax = plt.subplots()
+
 # Set the limits of the plot in the XY plane
 ax.set_xlim(-1, 21)
 ax.set_ylim(-1, 21)
-
-ax.xaxis.set_pane_color((0.53, 0.81, 0.92, 1.0))  # Sky blue
-ax.yaxis.set_pane_color((0.53, 0.81, 0.92, 1.0))
-ax.zaxis.set_pane_color((0.1, 1, 0.1, 1.0))
+ax.set_facecolor((0.2, 0.9, 0.2))
 population_sizes = []
 population_sizesLions = []
 lionavg_skill = []
@@ -330,11 +316,9 @@ lion_average_speed = []
 human_average_range = []
 lion_average_range = []
 
-# Update the scatter plot data with Z-axis coordinates
-people_offsets = np.array([(person.x, person.y, 0) for person in peopleDictionary])
-lion_offsets = np.array([(lion.x, lion.y, 0) for lion in LionDictionary])
-people_plot = ax.scatter([], [], [], marker='o', c='blue', label='People', s=15)
-lion_plot = ax.scatter([], [], [], c='red', label='Lions', s=15)
+# Initialize the scatter plots
+people_plot = ax.scatter([], [], marker='o', c='blue', label='People', s=15)
+lion_plot = ax.scatter([], [], c='red', label='Lions', s=15)
 # Initialize the year counter
 year = 0
 # Create pause and play buttons
@@ -349,10 +333,6 @@ add_people_button = Button(add_people_button_ax, '+', color='0.9', hovercolor='b
 
 play_button_ax = plt.axes([0.7, 0.05, 0.1, 0.05])
 play_button = Button(play_button_ax, 'Play', hovercolor='0.9')
-# Create a slider widget
-ax_slider = plt.axes([0.1, 0.05, 0.15, 0.03])
-zoom_slider = Slider(ax_slider, 'Zoom', valmin=5, valmax=10, valinit=initial_zoom)
-zoom_slider.on_changed(update_zoom)
 # Create a slider widget for mutation
 ax_mutation = plt.axes([0.1, 0.1, 0.15, 0.03])
 mutation_slider = Slider(ax_mutation, 'Mutation', valmin=0, valmax=2, valinit=mutation)
@@ -371,8 +351,8 @@ def update(frame):
     try:
         # if len(peopleDictionary)<=1:
         #     return
-        if len(LionDictionary) <= 2:
-            LionDictionary.append(Lion(5, 2, random.uniform(0, 20), random.uniform(0, 20), random.uniform(1, 3), 1))
+        # if len(LionDictionary) <= 2:
+        #     LionDictionary.append(Lion(5, 2, random.uniform(0, 20), random.uniform(0, 20), random.uniform(1, 3), 1))
         global year
         global humanaverage_age
         global lionaverage_age
@@ -380,25 +360,26 @@ def update(frame):
         global lionaverage_speed
         global humanaverage_range
         global lionaverage_range
+        global food
         if animation_paused:
             return
         # Calculate the current year based on the frame number
         year += 1
 
         # Run simulation for one year
-        runyear(food, agriculture, min_age_fertility, max_age_fertility,
+        runyear(agriculture, min_age_fertility, max_age_fertility,
                 infant_mortality, disaster_chance, youth_mortality, Lioninfant_mortality)
-        # Update scatter plot data with Z-axis coordinates
-        people_offsets = np.array([[person.x, person.y, 0] for person in peopleDictionary])
-        lion_offsets = np.array([[lion.x, lion.y, 0] for lion in LionDictionary])
-        people_plot._offsets3d = people_offsets.T
-        lion_plot._offsets3d = lion_offsets.T
+        people_offsets = np.array([(person.x, person.y) for person in peopleDictionary])
+        lion_offsets = np.array([(lion.x, lion.y) for lion in LionDictionary])
+        people_plot.set_offsets(people_offsets)
+        lion_plot.set_offsets(lion_offsets)
+
         # Calculate average skill
         averageskill = avgskill(LionDictionary)
 
         # Set title with average skill and year
         ax.set_title(
-            f'Year: {year}\nAverage Skill: {averageskill:.2f} Lions:{len(LionDictionary)}\n'
+            f'Year: {year} FOOD: {food}\nAverage Skill: {averageskill:.2f} Lions:{len(LionDictionary)}\n'
             f' Humans:{len(peopleDictionary)}')
         # Update population data
         population_sizes.append(len(peopleDictionary))
@@ -476,7 +457,7 @@ add_people_button.on_clicked(add_people)
 pause_button.on_clicked(pause_music)
 play_button.on_clicked(play_music)
 # Create animation
-animation = FuncAnimation(fig, update, frames=300, interval=100, repeat=False, blit=False)
+animation = FuncAnimation(fig, update, frames=600, interval=100, repeat=False, blit=False)
 # Add legend
 ax.legend()
 ax.legend(loc='upper left', bbox_to_anchor=(0.9, 1.1), fontsize='small')
