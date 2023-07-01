@@ -370,16 +370,17 @@ def update(frame):
         runyear(agriculture, min_age_fertility, max_age_fertility,
                 infant_mortality, disaster_chance, youth_mortality, Lioninfant_mortality)
         people_offsets = np.array([(person.x, person.y) for person in peopleDictionary])
-        lion_offsets = np.array([(lion.x, lion.y) for lion in LionDictionary])
         people_plot.set_offsets(people_offsets)
-        lion_plot.set_offsets(lion_offsets)
+        if len(LionDictionary)>=1:
+            lion_offsets = np.array([(lion.x, lion.y) for lion in LionDictionary])
+            lion_plot.set_offsets(lion_offsets)
 
         # Calculate average skill
         averageskill = avgskill(LionDictionary)
 
         # Set title with average skill and year
         ax.set_title(
-            f'Year: {year} FOOD: {food}\nAverage Skill: {averageskill:.2f} Lions:{len(LionDictionary)}\n'
+            f'Year: {year} FOOD: {int(food)}\nAverage Skill: {averageskill:.2f} Lions:{len(LionDictionary)}\n'
             f' Humans:{len(peopleDictionary)}')
         # Update population data
         population_sizes.append(len(peopleDictionary))
