@@ -302,7 +302,8 @@ fig, ax = plt.subplots()
 # Set the limits of the plot in the XY plane
 ax.set_xlim(-1, 21)
 ax.set_ylim(-1, 21)
-ax.set_facecolor((0.2, 0.9, 0.2))
+background_image = plt.imread("background_land.jpg")
+ax.imshow(background_image, extent=[-2, 22, -2, 22]) 
 population_sizes = []
 population_sizesLions = []
 lionavg_skill = []
