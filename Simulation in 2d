@@ -44,9 +44,10 @@ rain = 1  # Initial value for rain factor
 
 
 class Person:
-    def __init__(self, age, x, y, range_, speed):
+    def __init__(self, age, x, y, range_, speed,agri):
         self.gender = random.randint(0, 1)
         self.age = age
+        self.agri=agri
         self.x = x
         self.y = y
         if range_> 0:
@@ -161,23 +162,23 @@ def distancesquare(x1, y1, x2, y2):
     return (x2 - x1) ** 2 + (y2 - y1) ** 2
 
 
-def harvest(agriculture):
+def harvest():
     global rain
     global food
-    ablepeople = 0
+    ablepeople_production = 0
     # to reduce the for loop we are giving these functions inside this folder
     for person in peopleDictionary:
         if person.age > 8:
-            ablepeople += 1
+            ablepeople_production+=person.agri
         if person.age > 80:
             peopleDictionary.remove(person)
         else:
             person.age += 1
             person.move()
-    food += ablepeople * agriculture * rain
+    food += ablepeople_production* rain
 
     if food < len(peopleDictionary):
-        del peopleDictionary[0:int(len(peopleDictionary) - food)]
+        del peopleDictionary[0:(int(len(peopleDictionary) - food))]
         food = 0
     else:
         food -= len(peopleDictionary)
@@ -234,7 +235,7 @@ def reproduce(min_age_fertility, max_age_fertility, infant_mortality, Lioninfant
             if random.randint(0, 5) == 1 and random.randint(0, 100) > infant_mortality:
                 peopleDictionary.append(Person(0, person.x, person.y, person.range + random.uniform(-1, 1) * mutation,
                                                person.speed +
-                                               random.uniform(-0.5, 0.5) * mutation))  # adding mutation to range traits
+                                               random.uniform(-0.5, 0.5) * mutation,person.agri+random.uniform(-0.5, 0.5) * mutation))  # adding mutation to range traits
     for lion in LionDictionary:
         lionaverage_age += lion.age / len(LionDictionary)
         lionaverage_speed += lion.speed / len(LionDictionary)
@@ -245,14 +246,14 @@ def reproduce(min_age_fertility, max_age_fertility, infant_mortality, Lioninfant
                 LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range + random.uniform(-1, 1) * mutation,
                                            lion.speed +
                                            random.uniform(-0.5, 0.5) * mutation))  # adding mutation to range traits
-
 def begin_simulation():
     for i in range(startPopulation):
         x = random.uniform(0, 20)
         y = random.uniform(0, 20)
         range_ = random.uniform(1, 3)  # Range for each person
         speed = random.uniform(0.5, 1)
-        peopleDictionary.append(Person(random.randint(18, 50), x, y, range_, speed))
+        agri= random.uniform(0,3)
+        peopleDictionary.append(Person(random.randint(18, 50), x, y, range_, speed,agri))
     for j in range(startPopulation_Lion):
         x = random.uniform(0, 20)
         y = random.uniform(0, 20)
@@ -261,9 +262,9 @@ def begin_simulation():
         LionDictionary.append(Lion(random.randint(3, 15), random.uniform(1, 2.5), x, y, range_, speed))
 
 
-def runyear(agriculture, min_age_fertility, max_age_fertility, infant_mortality, disaster_chance, youth_mortality,
+def runyear(min_age_fertility, max_age_fertility, infant_mortality, disaster_chance, youth_mortality,
             Lioninfant_mortality):
-    harvest(agriculture)
+    harvest()
     prey()
     reproduce(min_age_fertility, max_age_fertility, infant_mortality, Lioninfant_mortality)
 
@@ -363,7 +364,7 @@ def update(frame):
         year += 1
 
         # Run simulation for one year
-        runyear(agriculture, min_age_fertility, max_age_fertility,
+        runyear(min_age_fertility, max_age_fertility,
                 infant_mortality, disaster_chance, youth_mortality, Lioninfant_mortality)
         if len(peopleDictionary) > 0:
             people_offsets = np.array([(person.x, person.y) for person in peopleDictionary])
@@ -440,8 +441,7 @@ def add_lion(event):
 
 
 def add_people(event):
-    peopleDictionary.append(Person(15, random.uniform(0, 20), random.uniform(0, 20), random.uniform(1, 2), 1.5))
-
+    peopleDictionary.append(Person(15, random.uniform(0, 20), random.uniform(0, 20), random.uniform(1, 2), 1.5,random.uniform(1,3)))
 
 def play_animation(event):
     global animation_paused
