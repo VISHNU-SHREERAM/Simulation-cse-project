@@ -212,8 +212,6 @@ def prey():
         else:
             lion.age += 1
             lion.move()
-
-
 def reproduce(min_age_fertility, max_age_fertility, infant_mortality, Lioninfant_mortality):
     global humanaverage_age
     global lionaverage_age
@@ -247,7 +245,6 @@ def reproduce(min_age_fertility, max_age_fertility, infant_mortality, Lioninfant
                 LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range + random.uniform(-1, 1) * mutation,
                                            lion.speed +
                                            random.uniform(-0.5, 0.5) * mutation))  # adding mutation to range traits
-
 
 def begin_simulation():
     for i in range(startPopulation):
@@ -296,7 +293,6 @@ def update_mutation(val):
 def update_rain(val):
     global rain
     rain = val
-
 begin_simulation()
 fig, ax2 = plt2.subplots(3, sharex=True, sharey=False)
 
@@ -369,12 +365,16 @@ def update(frame):
         # Run simulation for one year
         runyear(agriculture, min_age_fertility, max_age_fertility,
                 infant_mortality, disaster_chance, youth_mortality, Lioninfant_mortality)
-        people_offsets = np.array([(person.x, person.y) for person in peopleDictionary])
-        people_plot.set_offsets(people_offsets)
-        if len(LionDictionary)>=1:
+        if len(peopleDictionary) > 0:
+            people_offsets = np.array([(person.x, person.y) for person in peopleDictionary])
+            people_plot.set_offsets(people_offsets)
+        else:
+            people_plot.set_offsets(np.empty((0, 2)))  # Set empty offsets if no people
+        if len(LionDictionary) > 0:
             lion_offsets = np.array([(lion.x, lion.y) for lion in LionDictionary])
             lion_plot.set_offsets(lion_offsets)
-
+        else:
+            lion_plot.set_offsets(np.empty((0, 2)))  # Set empty offsets if no lions
         # Calculate average skill
         averageskill = avgskill(LionDictionary)
 
@@ -392,7 +392,6 @@ def update(frame):
         human_average_range.append(humanaverage_range)
         lion_average_speed.append(lionaverage_speed)
         lion_average_range.append(lionaverage_range)
-
         ax2[0].clear()
         ax2[0].plot(range(year), population_sizes, color='blue', label='Humans Population')
         ax2[0].plot(range(year), population_sizesLions, color='red', label='Lions Population')
