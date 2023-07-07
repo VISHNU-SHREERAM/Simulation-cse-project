@@ -236,6 +236,8 @@ def reproduce(min_age_fertility, max_age_fertility, infant_mortality, Lioninfant
                 peopleDictionary.append(Person(0, person.x, person.y, person.range + random.uniform(-1, 1) * mutation,
                                                person.speed +
                                                random.uniform(-0.5, 0.5) * mutation,person.agri+random.uniform(-0.5, 0.5) * mutation))  # adding mutation to range traits
+        # ax.imshow(people_image, extent=[person.x-0.1, person.x+0.1, person.y-0.1, person.y+0.1], aspect='auto')
+
     for lion in LionDictionary:
         lionaverage_age += lion.age / len(LionDictionary)
         lionaverage_speed += lion.speed / len(LionDictionary)
@@ -246,6 +248,7 @@ def reproduce(min_age_fertility, max_age_fertility, infant_mortality, Lioninfant
                 LionDictionary.append(Lion(0, ranskill, lion.x, lion.y, lion.range + random.uniform(-1, 1) * mutation,
                                            lion.speed +
                                            random.uniform(-0.5, 0.5) * mutation))  # adding mutation to range traits
+        # ax.imshow(lion_image, extent=[lion.x-0.5, lion.x+0.5, lion.y-0.5, lion.y+0.5], aspect='auto')
 def begin_simulation():
     for i in range(startPopulation):
         x = random.uniform(0, 20)
@@ -313,6 +316,9 @@ human_average_speed = []
 lion_average_speed = []
 human_average_range = []
 lion_average_range = []
+lion_image = plt.imread('lion.jpg')
+people_image = plt.imread('human.jpg')
+
 
 # Initialize the scatter plots
 people_plot = ax.scatter([], [], marker='o', c='blue', label='People', s=15)
@@ -379,7 +385,6 @@ def update(frame):
             lion_plot.set_offsets(np.empty((0, 2)))  # Set empty offsets if no lions
         # Calculate average skill
         averageskill = avgskill(LionDictionary)
-
         # Set title with average skill and year
         ax.set_title(
             f'Year: {year} FOOD: {int(food)}\nAverage Skill: {averageskill:.2f} Lions:{len(LionDictionary)}\n'
